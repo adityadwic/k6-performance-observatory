@@ -32,6 +32,7 @@ This project serves as a showcase of **Senior QA Engineering** practices. It mov
 ## 📸 Report Preview
 
 The framework generates a **modern dark-themed HTML dashboard** to provide clear, actionable insights for both engineers and stakeholders.
+<img width="1439" height="776" alt="image" src="https://github.com/user-attachments/assets/50974e3a-d04d-4f49-95d2-6fd33a59ad73" />
 
 *(Tip: You can upload a screenshot of your report to `<repository>/assets/report-preview.png` and uncomment the line below for maximum portfolio impact!)*
 <!-- ![HTML Dashboard Preview](assets/report-preview.png) -->
@@ -44,6 +45,7 @@ The framework generates a **modern dark-themed HTML dashboard** to provide clear
 - 🟢 Pass rate percentage ring (animated)
 - Status: HEALTHY / WARNING / CRITICAL  
 - Test metadata (profile, duration, target)
+<img width="1439" height="778" alt="image" src="https://github.com/user-attachments/assets/2ff13f6f-bafd-41f4-8a97-47801a763b56" />
 
 </td>
 <td width="50%">
