@@ -1,19 +1,40 @@
-# 🚀 Performance & Observability Validation Framework
+# 🚀 Advanced Performance & Observability Validation Framework
 
-[![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
-[![K6](https://img.shields.io/badge/K6-Load_Testing-7D5694?logo=k6&logoColor=white)](https://k6.io/)
-[![Jest](https://img.shields.io/badge/Jest-21_Tests-C21325?logo=jest&logoColor=white)](https://jestjs.io/)
-[![GitHub Actions](https://img.shields.io/badge/CI/CD-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)](https://github.com/features/actions)
+<div align="center">
+  <img src="https://img.shields.io/badge/Node.js-18+-339933?logo=node.js&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/K6-Load_Testing-7D5694?logo=k6&logoColor=white" alt="K6" />
+  <img src="https://img.shields.io/badge/Jest-21_Tests-C21325?logo=jest&logoColor=white" alt="Jest" />
+  <img src="https://img.shields.io/badge/CI/CD-GitHub_Actions-2088FF?logo=githubactions&logoColor=white" alt="GitHub Actions" />
+  <br/>
+  <strong>An enterprise-grade performance testing & observability framework designed to validate client-side performance against server-side system health.</strong>
+</div>
 
-An **enterprise-grade** performance testing & observability framework built by a **Senior QA Engineer**. Goes beyond traditional load testing by correlating **client-side performance metrics** (K6) with **server-side system health** (Prometheus/Grafana) and validating everything against **configurable SLAs**.
+<br/>
 
-> 🎯 **Demo Target**: [JSONPlaceholder](https://jsonplaceholder.typicode.com) — swap with your own API endpoint via `.env`
+> 👨‍💻 **Portfolio Project by [Aditya Dwi Cahyono](https://github.com/adityadwic)** — Quality Assurance Engineer
+> 🎯 **Demo Target**: [JSONPlaceholder](https://jsonplaceholder.typicode.com) — configurable via `.env`
+
+---
+
+## 📖 Overview
+
+This project serves as a showcase of **Senior QA Engineering** practices. It moves beyond traditional load testing (which typically just pings an endpoint and checks response times) and implements a robust framework that correlates **K6 performance metrics** with **Prometheus/Grafana infrastructure observability**, validating all outcomes against strict, **profile-based SLAs**.
+
+### 💼 What this project demonstrates:
+- **Advanced Load Testing:** Scenario-based workload modeling using K6.
+- **Observability Integration:** Telemetry data correlation (Prometheus/Grafana).
+- **Automated SLA Validation:** Dynamic pipeline thresholds that catch regressions.
+- **Reporting & Notifications:** Custom dark-themed HTML dashboards and multi-channel alerting (Slack, Discord, Teams).
+- **CI/CD Excellence:** Fully automated GitHub Actions pipeline with historical baseline tracking.
 
 ---
 
 ## 📸 Report Preview
 
-The framework generates a **modern dark-themed HTML dashboard** with:
+The framework generates a **modern dark-themed HTML dashboard** to provide clear, actionable insights for both engineers and stakeholders.
+
+*(Tip: You can upload a screenshot of your report to `<repository>/assets/report-preview.png` and uncomment the line below for maximum portfolio impact!)*
+<!-- ![HTML Dashboard Preview](assets/report-preview.png) -->
 
 <table>
 <tr>
@@ -74,35 +95,7 @@ The framework generates a **modern dark-themed HTML dashboard** with:
 
 ## 📂 Project Structure
 
-```
-├── .env                          # Environment configuration
-├── .gitignore                    # Git ignore rules
-├── .eslintrc.json                # ESLint configuration
-├── .prettierrc                   # Prettier formatting config
-├── .github/workflows/
-│   └── performance-test.yml      # CI/CD pipeline
-├── index.js                      # 🚦 Main Orchestrator
-├── package.json                  # Dependencies & scripts
-│
-├── __tests__/                    # 🧪 Unit Tests (21 tests, 3 suites)
-│   ├── slaValidator.test.js      # SLA threshold validation tests
-│   ├── k6Runner.test.js          # K6 metric extraction tests
-│   └── reporter.test.js          # Report generation tests
-│
-└── src/
-    ├── config/
-    │   └── sla.json              # 📏 SLA thresholds per profile + alert levels
-    ├── core/
-    │   ├── k6Runner.js           # 🏎️ K6 execution & metric extraction
-    │   └── slaValidator.js       # 📏 SLA validation engine
-    ├── tests/
-    │   └── load_test.js          # 🏎️ K6 Load Test Script (5 scenarios)
-    └── utils/
-        ├── grafana.js            # 📊 Grafana Annotations
-        ├── notifier.js           # 🔔 Multi-channel Notifications
-        ├── prometheus.js         # 📡 Prometheus Integration
-        └── reporter.js           # 📈 HTML/JSON/JUnit Report Generator
-```
+The project is modularized into core runners, configurations, test scripts, and utility modules (for Grafana, Prometheus, and multi-channel notifications) to maintain enterprise-grade scalability and maintainability.
 
 ---
 
@@ -117,44 +110,16 @@ The framework generates a **modern dark-themed HTML dashboard** with:
 
 ### Install K6
 
-```bash
-# macOS
-brew install k6
-
-# Windows
-choco install k6
-
-# Linux (Debian/Ubuntu)
-sudo gpg -k
-sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C4914A4B7C3C
-echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
-sudo apt-get update && sudo apt-get install k6
-```
+K6 can be seamlessly installed across macOS, Windows, and Linux operating systems via their respective standard package managers (`brew`, `choco`, `apt`).
 
 ---
 
 ## 🚀 Quick Start
 
-```bash
-# 1. Install dependencies
-npm install
-
-# 2. Configure target (optional — defaults to JSONPlaceholder)
-cp .env.example .env
-# Edit .env with your target URL
-
-# 3. Run tests
-npm start                        # Default profile
-npm start -- --profile=smoke     # Quick smoke test
-npm start -- --profile=stress    # High load test
-npm start -- --profile=spike     # Spike test
-
-# 4. Run unit tests
-npm test
-
-# 5. View report
-open reports/report.html
-```
+1. Install framework dependencies via standard npm commands.
+2. Configure your specific target URL and variables in the `.env` file.
+3. Automatically execute the test suites against various load profiles (e.g., `smoke`, `stress`) using the start scripts.
+4. Easily view the aggregated HTML test report generated upon the run's completion.
 
 ---
 
@@ -185,24 +150,7 @@ The K6 script executes **5 weighted scenarios** to simulate realistic traffic:
 
 ## 📏 SLA Configuration
 
-Thresholds are defined in `src/config/sla.json`:
-
-```json
-{
-  "performance": {
-    "p50_response_time_ms": 800,
-    "p90_response_time_ms": 2000,
-    "p95_response_time_ms": 3000,
-    "p99_response_time_ms": 8000,
-    "max_error_rate_percent": 5,
-    "min_throughput_rps": 2
-  },
-  "alerts": {
-    "warning": { "p95_response_time_ms": 2000, "max_error_rate_percent": 8 },
-    "critical": { "p95_response_time_ms": 5000, "max_error_rate_percent": 20 }
-  }
-}
-```
+All threshold values are centrally defined in a configuration JSON, allowing you to finely tune performance limits—such as maximum P50/P90/P95/P99 response times, error rate limits, and minimum throughput validations—across specific alerting severity levels (`warning` and `critical`).
 
 ---
 
@@ -232,163 +180,55 @@ Thresholds are defined in `src/config/sla.json`:
 
 ---
 
-## 🔔 Notifications
+## 🔔 Notifications & CI/CD
 
 ### Supported Channels
+| Platform | Format |
+|----------|--------|
+| **Slack** | Rich blocks + action buttons |
+| **Discord** | Embeds + role mentions |
+| **MS Teams** | Adaptive cards |
+| **Email** | SendGrid HTML template |
 
-| Platform | Detection | Format |
-|----------|-----------|--------|
-| **Slack** | `slack.com` in URL | Rich blocks + action buttons |
-| **Discord** | `discord.com` in URL | Embeds + role mentions |
-| **MS Teams** | `office.com` in URL | Adaptive cards |
-| **Email** | SendGrid API | HTML template |
-
-```env
-# Slack/Discord/Teams
-WEBHOOK_URL=https://hooks.slack.com/services/T000/B000/XXXX
-
-# Email (SendGrid)
-EMAIL_ENABLED=true
-EMAIL_API_KEY=SG.xxxxx
-EMAIL_FROM=noreply@perf-qa.com
-EMAIL_TO=team@example.com
-```
-
----
-
-## 🤖 CI/CD — GitHub Actions
-
-The pipeline (`performance-test.yml`) supports:
-
+### GitHub Actions
+The pipeline (`.github/workflows/performance-test.yml`) supports:
 - ⚡ **Manual trigger** — select profile via GitHub UI
-- ⏰ **Scheduled runs** — daily at 2 AM UTC
+- ⏰ **Scheduled runs** — daily automated monitoring
 - 🔄 **Push triggers** — auto-run on `main` branch changes
-- 📊 **Baseline comparison** — detects >20% P95 regression
-- 📦 **Artifact storage** — 30-day report retention
-- 💬 **PR comments** — auto-post results on pull requests
-
-```bash
-# Trigger manually via CLI
-gh workflow run performance-test.yml -f profile=stress
-```
+- 📊 **Baseline comparison** — detects regressions automatically
+- 📦 **Artifact storage** — report retention
 
 ---
 
 ## 🎯 CLI Reference
 
-```bash
-npm start -- [options]
-
-Options:
-  --profile, -p <name>    Test profile: smoke | default | stress | spike
-  --skip-k6               Skip K6 execution, use existing results
-  --dry-run               Verify configuration without running tests
-```
+The built-in command-line abstraction provides simple flags to dynamically dictate workload profiles, reuse specific existing testing results without rerunning K6 engines, or simply run a configuration validation check.
 
 ---
 
-## 📊 Example Output
+## 📊 Test Execution Output
 
-```
-════════════════════════════════════════════════════════════
-🚀 Advanced Performance & Observability Validation
-════════════════════════════════════════════════════════════
-🎯 Target URL: https://jsonplaceholder.typicode.com
-🎛️  Workload Profile: DEFAULT
-📅 Started at: 2/22/2026, 1:45:00 PM
-════════════════════════════════════════════════════════════
-
-[1/6] 🏎️  Running K6 Load Test (default profile)...
-[2/6] 📊 Extracting Performance Metrics...
-      -> P50 Response Time: 194.52 ms
-      -> P90 Response Time: 1696.53 ms
-      -> P95 Response Time: 1997.62 ms
-      -> P99 Response Time: 3119.71 ms
-      -> Error Rate: 2.17%
-      -> Throughput: 2.91 req/s
-
-[4/6] 📏 Validating against defined SLAs...
-      ──────────────────────────────────────────────────
-      [✅] P50 Response Time (ms): 194.52 (threshold: ≤ 800)
-      [✅] P90 Response Time (ms): 1696.53 (threshold: ≤ 2000)
-      [✅] P95 Response Time (ms): 1997.62 (threshold: ≤ 3000)
-      [✅] P99 Response Time (ms): 3119.71 (threshold: ≤ 8000)
-      [✅] Error Rate (%): 2.17 (threshold: ≤ 5)
-      [✅] Throughput (req/s): 2.91 (threshold: ≥ 2)
-      ──────────────────────────────────────────────────
-      📊 Summary: 6/6 checks passed
-
-════════════════════════════════════════════════════════════
-🎉 Process completed for profile: default
-⏱️  Total Duration: 35.33s
-📊 Results: 6/6 checks passed
-════════════════════════════════════════════════════════════
-```
+Upon execution, the framework gracefully manages logging, directly printing real-time K6 orchestration events, performance metric extraction data, and structured PASS/FAIL indicators from the SLA validation layer right to your terminal stdout.
 
 ---
 
 ## 🛠️ Extending the Framework
 
-### Add a Custom Scenario
-
-```javascript
-// In src/tests/load_test.js
-const scenarios = {
-  myCustomScenario: () => {
-    const res = http.post(`${BASE_URL}/api/data`, JSON.stringify(payload), {
-      headers: { 'Content-Type': 'application/json' },
-      tags: { endpoint: 'custom', method: 'POST' }
-    });
-
-    const body = res.json();
-    check(res, {
-      'status is 200': (r) => r.status === 200,
-      'has expected field': () => body.id !== undefined,
-    }, { endpoint: 'custom' });
-  }
-};
-
-// Add weight for it
-const scenarioWeights = {
-  browse: 0.35, detail: 0.25, login: 0.15,
-  custom: 0.15, invalid: 0.05, health: 0.05
-};
-```
+Because scripts are compartmentalized and intelligently grouped, you can effortlessly introduce specific HTTP verbs, add new complex custom endpoints, and append data-specific schema checks inside the existing scenarios without touching the core validation engine.
 
 ---
 
-## 📡 Prometheus Queries
+## 🤝 Let's Connect!
 
-```promql
-# CPU Usage
-100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[1m])) * 100)
+I am an experienced **Quality Assurance Engineer** passionate about building robust testing infrastructure and implementing smart automation. 
 
-# Memory Usage
-(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100
+- **GitHub:** [@adityadwic](https://github.com/adityadwic)
+- *(Feel free to add your LinkedIn or Portfolio link here)*
 
-# Disk I/O
-rate(node_disk_io_time_seconds_total[1m])
-
-# Network Traffic
-rate(node_network_receive_bytes_total[1m])
-```
+If you find this project interesting, feel free to **fork it**, **star it ⭐**, or reach out to discuss QA engineering best practices!
 
 ---
 
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
----
-
-## 📚 Resources
-
-- [K6 Documentation](https://k6.io/docs/)
-- [Prometheus Query Guide](https://prometheus.io/docs/prometheus/latest/querying/basics/)
-- [Chart.js Documentation](https://www.chartjs.org/docs/)
-- [GitHub Actions Workflow](https://docs.github.com/en/actions)
-- [JSONPlaceholder API](https://jsonplaceholder.typicode.com/)
-
----
-
-<p align="center">Built with ❤️ for the QA Engineering Community</p>
+<p align="center">
+  Built with ❤️ by Aditya Dwi Cahyono for the QA Engineering Community
+</p>
