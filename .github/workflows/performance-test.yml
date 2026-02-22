@@ -1,0 +1,270 @@
+name: Performance Test
+
+on:
+  # Manual trigger with profile selection
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: "Test profile to run"
+        required: true
+        default: "default"
+        type: choice
+        options:
+          - smoke
+          - default
+          - stress
+          - spike
+      target_url:
+        description: "Target URL to test"
+        required: false
+        default: ""
+
+  # Scheduled runs (daily at 2 AM UTC)
+  schedule:
+    - cron: "0 2 * * *"
+
+  # Trigger on push to main (for testing changes)
+  push:
+    branches:
+      - main
+    paths:
+      - "src/**"
+      - "index.js"
+
+env:
+  NODE_VERSION: "18"
+
+jobs:
+  performance-test:
+    name: Run Performance Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Setup K6
+        uses: grafana/setup-k6-action@v1
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Performance Test
+        id: perf-test
+        env:
+          TARGET_URL: ${{ github.event.inputs.target_url || vars.TARGET_URL || 'https://jsonplaceholder.typicode.com' }}
+          PROMETHEUS_URL: ${{ secrets.PROMETHEUS_URL }}
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+          GRAFANA_URL: ${{ secrets.GRAFANA_URL }}
+          GRAFANA_TOKEN: ${{ secrets.GRAFANA_TOKEN }}
+          EMAIL_ENABLED: ${{ vars.EMAIL_ENABLED }}
+          EMAIL_API_KEY: ${{ secrets.EMAIL_API_KEY }}
+          EMAIL_FROM: ${{ vars.EMAIL_FROM }}
+          EMAIL_TO: ${{ vars.EMAIL_TO }}
+        run: |
+          npm start -- --profile=${{ github.event.inputs.profile || 'default' }}
+          echo "exit_code=$?" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Upload Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: performance-reports
+          path: |
+            reports/report.html
+            reports/report.json
+            reports/junit-report.xml
+            reports/k6-summary.json
+            reports/k6-raw.json
+          retention-days: 30
+
+      - name: Upload JUnit Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: junit-results
+          path: reports/junit-report.xml
+          retention-days: 7
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: reports/junit-report.xml
+          check_name: "SLA Validation Results"
+          comment_mode: "off"
+
+      - name: Comment PR with Results
+        if: github.event_name == 'push' && github.event.pull_request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            try {
+              const report = JSON.parse(fs.readFileSync('reports/report.json', 'utf8'));
+              const status = report.status === 'PASSED' ? '✅' : '❌';
+              
+              const body = `## ${status} Performance Test Results
+              
+              **Profile:** ${report.metadata.profile}
+              **Target:** ${report.metadata.targetUrl}
+              **Status:** ${report.status}
+              
+              | Metric | Actual | Threshold | Status |
+              |--------|--------|-----------|--------|
+              ${report.results.map(r => `| ${r.metric} | ${r.actual} | ${r.threshold} | ${r.passed ? '✅' : '❌'} |`).join('\n')}
+              
+              [📊 View Full Report](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID})
+              `;
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            } catch (e) {
+              console.log('Could not post comment:', e.message);
+            }
+
+      - name: Check Test Result
+        if: steps.perf-test.outputs.exit_code == '1'
+        run: |
+          echo "❌ Performance test failed SLA checks"
+          exit 1
+
+  # Optional: Baseline comparison job
+  baseline-comparison:
+    name: Compare with Baseline
+    runs-on: ubuntu-latest
+    needs: performance-test
+    if: always() && needs.performance-test.result == 'success'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download current report
+        uses: actions/download-artifact@v4
+        with:
+          name: performance-reports
+          path: current
+
+      - name: Download baseline report
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: baseline-performance-report
+          path: baseline
+
+      - name: Compare Reports
+        id: compare
+        run: |
+          if [ -f "baseline/report.json" ]; then
+            echo "📊 Comparing with baseline..."
+            
+            # Extract P95 from current and baseline
+            CURRENT_P95=$(cat current/report.json | jq -r '.results[] | select(.metric | contains("P95")) | .actual' | head -1)
+            BASELINE_P95=$(cat baseline/report.json | jq -r '.results[] | select(.metric | contains("P95")) | .actual' | head -1)
+            
+            echo "Current P95: ${CURRENT_P95}ms"
+            echo "Baseline P95: ${BASELINE_P95}ms"
+            
+            # Check for regression (>20% slower)
+            if [ ! -z "$BASELINE_P95" ] && [ ! -z "$CURRENT_P95" ]; then
+              REGRESSION=$(echo "scale=2; ($CURRENT_P95 - $BASELINE_P95) / $BASELINE_P95 * 100" | bc)
+              echo "Regression: ${REGRESSION}%"
+              
+              if (( $(echo "$REGRESSION > 20" | bc -l) )); then
+                echo "⚠️ Performance regression detected: ${REGRESSION}%"
+                echo "regression=true" >> $GITHUB_OUTPUT
+              else
+                echo "✅ No significant regression"
+                echo "regression=false" >> $GITHUB_OUTPUT
+              fi
+            fi
+          else
+            echo "No baseline found, skipping comparison"
+          fi
+
+      - name: Update Baseline
+        if: steps.compare.outputs.regression != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: baseline-performance-report
+          path: current/report.json
+          retention-days: 90
+          overwrite: true
+
+  # Notification job
+  notify:
+    name: Send Notifications
+    runs-on: ubuntu-latest
+    needs: [performance-test]
+    if: always()
+
+    steps:
+      - name: Download reports
+        uses: actions/download-artifact@v4
+        with:
+          name: performance-reports
+          path: reports
+
+      - name: Read Results
+        id: results
+        run: |
+          STATUS=$(cat reports/report.json | jq -r '.status')
+          PASSED=$(cat reports/report.json | jq -r '.summary.passed')
+          FAILED=$(cat reports/report.json | jq -r '.summary.failed')
+          PROFILE=$(cat reports/report.json | jq -r '.metadata.profile')
+
+          echo "status=${STATUS}" >> $GITHUB_OUTPUT
+          echo "passed=${PASSED}" >> $GITHUB_OUTPUT
+          echo "failed=${FAILED}" >> $GITHUB_OUTPUT
+          echo "profile=${PROFILE}" >> $GITHUB_OUTPUT
+
+      - name: Send Slack Notification
+        if: vars.SLACK_WEBHOOK_URL != ''
+        uses: slackapi/slack-github-action@v1.25.0
+        with:
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "${{ steps.results.outputs.status == 'PASSED' && '✅' || '❌' }} Performance Test ${{ steps.results.outputs.status }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    { "type": "mrkdwn", "text": "*Profile:*\n${{ steps.results.outputs.profile }}" },
+                    { "type": "mrkdwn", "text": "*Results:*\n${{ steps.results.outputs.passed }} passed, ${{ steps.results.outputs.failed }} failed" }
+                  ]
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": { "type": "plain_text", "text": "View Report" },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK

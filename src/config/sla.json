@@ -1,0 +1,44 @@
+{
+    "performance": {
+        "p50_response_time_ms": 800,
+        "p90_response_time_ms": 2000,
+        "p95_response_time_ms": 3000,
+        "p99_response_time_ms": 8000,
+        "max_error_rate_percent": 5,
+        "min_throughput_rps": 2
+    },
+    "infrastructure": {
+        "max_cpu_usage_percent": 80,
+        "max_memory_usage_percent": 85,
+        "max_disk_io_percent": 70,
+        "max_network_latency_ms": 50
+    },
+    "profiles": {
+        "smoke": {
+            "p95_response_time_ms": 1500,
+            "max_error_rate_percent": 1
+        },
+        "default": {
+            "p95_response_time_ms": 3000,
+            "max_error_rate_percent": 5
+        },
+        "stress": {
+            "p95_response_time_ms": 5000,
+            "max_error_rate_percent": 10
+        },
+        "spike": {
+            "p95_response_time_ms": 8000,
+            "max_error_rate_percent": 15
+        }
+    },
+    "alerts": {
+        "critical": {
+            "p95_response_time_ms": 5000,
+            "max_error_rate_percent": 20
+        },
+        "warning": {
+            "p95_response_time_ms": 2000,
+            "max_error_rate_percent": 8
+        }
+    }
+}

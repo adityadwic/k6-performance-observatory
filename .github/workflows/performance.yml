@@ -1,0 +1,50 @@
+name: Performance & Observability Validation
+
+on:
+  schedule:
+    - cron: "0 2 * * *" # Run automatically everyday at 02:00 AM (Nightly Build)
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: "Load test profile (smoke, stress, spike, default)"
+        required: true
+        default: "default"
+  pull_request:
+    branches:
+      - main # Block PRs going to main if performance deteriorates
+
+jobs:
+  validate-performance:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Install k6
+        uses: grafana/setup-k6-action@v1
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Performance Correlation Framework
+        env:
+          TARGET_URL: ${{ secrets.TARGET_URL }}
+          PROMETHEUS_URL: ${{ secrets.PROMETHEUS_URL }}
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+          GRAFANA_URL: ${{ secrets.GRAFANA_URL }}
+          GRAFANA_TOKEN: ${{ secrets.GRAFANA_TOKEN }}
+        run: |
+          node index.js --profile=${{ github.event.inputs.profile || 'default' }}
+
+      - name: Upload HTML Report (CI Artifact)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Performance-Observability-Report
+          path: reports/

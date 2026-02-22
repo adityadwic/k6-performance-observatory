@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Reports (generated artifacts)
+reports/*.json
+reports/*.html
+reports/*.xml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Root level stale files
+/k6-summary.json
+/report.html
+/report.json
+/history.json
+
+# Logs
+*.log
+npm-debug.log*

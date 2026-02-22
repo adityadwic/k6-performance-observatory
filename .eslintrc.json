@@ -1,0 +1,35 @@
+{
+    "env": {
+        "node": true,
+        "jest": true,
+        "es2021": true
+    },
+    "extends": "eslint:recommended",
+    "parserOptions": {
+        "ecmaVersion": "latest"
+    },
+    "rules": {
+        "no-unused-vars": [
+            "warn",
+            {
+                "argsIgnorePattern": "^_"
+            }
+        ],
+        "no-console": "off",
+        "prefer-const": "error",
+        "no-var": "error",
+        "eqeqeq": [
+            "error",
+            "always"
+        ],
+        "curly": [
+            "error",
+            "multi-line"
+        ]
+    },
+    "ignorePatterns": [
+        "node_modules/",
+        "reports/",
+        "src/tests/load_test.js"
+    ]
+}
