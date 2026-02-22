@@ -206,9 +206,43 @@ The built-in command-line abstraction provides simple flags to dynamically dicta
 
 ---
 
-## 📊 Test Execution Output
+## 📊 Example Output
 
-Upon execution, the framework gracefully manages logging, directly printing real-time K6 orchestration events, performance metric extraction data, and structured PASS/FAIL indicators from the SLA validation layer right to your terminal stdout.
+```text
+════════════════════════════════════════════════════════════
+🚀 Advanced Performance & Observability Validation
+════════════════════════════════════════════════════════════
+🎯 Target URL: https://jsonplaceholder.typicode.com
+🎛️  Workload Profile: DEFAULT
+📅 Started at: 2/22/2026, 1:45:00 PM
+════════════════════════════════════════════════════════════
+
+[1/6] 🏎️  Running K6 Load Test (default profile)...
+[2/6] 📊 Extracting Performance Metrics...
+      -> P50 Response Time: 194.52 ms
+      -> P90 Response Time: 1696.53 ms
+      -> P95 Response Time: 1997.62 ms
+      -> P99 Response Time: 3119.71 ms
+      -> Error Rate: 2.17%
+      -> Throughput: 2.91 req/s
+
+[4/6] 📏 Validating against defined SLAs...
+      ──────────────────────────────────────────────────
+      [✅] P50 Response Time (ms): 194.52 (threshold: ≤ 800)
+      [✅] P90 Response Time (ms): 1696.53 (threshold: ≤ 2000)
+      [✅] P95 Response Time (ms): 1997.62 (threshold: ≤ 3000)
+      [✅] P99 Response Time (ms): 3119.71 (threshold: ≤ 8000)
+      [✅] Error Rate (%): 2.17 (threshold: ≤ 5)
+      [✅] Throughput (req/s): 2.91 (threshold: ≥ 2)
+      ──────────────────────────────────────────────────
+      📊 Summary: 6/6 checks passed
+
+════════════════════════════════════════════════════════════
+🎉 Process completed for profile: default
+⏱️  Total Duration: 35.33s
+📊 Results: 6/6 checks passed
+════════════════════════════════════════════════════════════
+```
 
 ---
 
