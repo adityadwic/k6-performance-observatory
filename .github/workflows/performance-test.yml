@@ -23,13 +23,17 @@ on:
   schedule:
     - cron: "0 2 * * *"
 
-  # Trigger on push to main (for testing changes)
+  # Trigger on push to master (for testing changes)
   push:
     branches:
-      - main
+      - master
     paths:
       - "src/**"
       - "index.js"
+
+  pull_request:
+    branches:
+      - master
 
 env:
   NODE_VERSION: "18"
@@ -110,7 +114,7 @@ jobs:
           comment_mode: "off"
 
       - name: Comment PR with Results
-        if: github.event_name == 'push' && github.event.pull_request
+        if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
           script: |
